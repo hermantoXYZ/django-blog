@@ -209,4 +209,4 @@ urlpatterns = [
 ![List Galery](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/8.JPG)
 
 ## License <a name="license"></a>
-XYZHermanto. Check `LICENSE`.
+HermantoZYZ. Check `LICENSE`.
