@@ -201,8 +201,12 @@ urlpatterns = [
 - http://127.0.0.1:8000/page/about/ contoh page dengan nama about
 
 
-![List Galery](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/3.JPG)
-
+![List Galery](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/3.JPG)
+![List Galery](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/4.JPG)
+![List Galery](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/5.JPG)
+![List Galery](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/6.JPG)
+![List Galery](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/7.JPG)
+![List Galery](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/8.JPG)
 
 ## License <a name="license"></a>
 XYZHermanto. Check `LICENSE`.
