@@ -1,4 +1,4 @@
-# Django-eccomerce for Learning HTML/CSS
+# Django-Blog for Learning HTML/CSS
 
 # Read more..
 
@@ -23,74 +23,30 @@ Untuk membuat model hingga menampilkan halaman template HTML di Django, Anda per
 
 Dengan mengikuti langkah-langkah ini, Anda dapat membuat model, menampilkan data dari model tersebut di halaman template HTML, dan menangani permintaan HTTP menggunakan Django. Pastikan untuk menyesuaikan nama model, tampilan, URL, dan template sesuai dengan kebutuhan aplikasi Anda.
 
-# PROJECT ECCOMERCE
+# PROJECT BLOG
 
 # Buat Model:
 
 ## 1. Definisikan kelas model:
-[File Model.py](https://github.com/hermantoXYZ/django-eccomerce/edit/main/accounts/models.py)
+[File Model.py](https://github.com/hermantoXYZ/django-blog/blob/main/blog/models.py)
 ```
-# tambahkan model Category, Product, Order, OrderItem, Costumer
+# blog/models.py
+
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
 
-
 class Category(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField()
-
+    slug = models.SlugField(unique=True)
+    category = models.CharField(max_length=100)
+ 
     def __str__(self):
-        return self.name
-
-class Product(models.Model):
-    name = models.CharField(max_length=200)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.TextField()
-    image = models.ImageField(upload_to='product_images/')
-
-    def __str__(self):
-        return self.name
-
-class Order(models.Model):
-    customer_name = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=20)
-    address = models.TextField()
-    products = models.ManyToManyField(Product, through='OrderItem')
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    created_at = models.DateTimeField(default=timezone.now)
-
-    def __str__(self):
-        return f"Order #{self.id}"
-
-
-
-class OrderItem(models.Model):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)  # Adding the quantity field
-    subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0)  # Calculated subtotal based on quantity and product price
-
-    def save(self, *args, **kwargs):
-        # Calculate subtotal based on product price and quantity
-        self.subtotal = self.product.price * self.quantity
-        super().save(*args, **kwargs)
-
-class Customer(models.Model):
-    name = models.CharField(max_length=100)
-    email = models.EmailField(unique=True)
-    address = models.TextField()
-
-    def __str__(self):
-        return self.name
-    
+        return self.category
 
 class Page(models.Model):
     title = models.CharField(max_length=100)
     content = models.TextField()
     image = models.ImageField(upload_to='page_images/')
-    created = models.DateTimeField(default=timezone.now)
     slug = models.SlugField(unique=True, max_length=255)
     is_published = models.BooleanField(default=False)
 
@@ -101,8 +57,28 @@ class Page(models.Model):
 
     def __str__(self):
         return self.title
-    
-#DevelopHermantoXYZ
+
+class Blog(models.Model):
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    author = models.CharField(max_length=100)
+    content = models.TextField()
+    image = models.ImageField(upload_to='post_images/')
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    description = models.TextField()
+    status = models.IntegerField(choices=[
+        (0, 'Draft'),
+        (1, 'Published'),
+    ], default=0)
+    created_date = models.DateTimeField(default=timezone.now)
+    published_date = models.DateTimeField(blank=True, null=True)
+
+    def publish(self):
+        self.published_date = timezone.now()
+        self.save()
+
+    def __str__(self):
+        return self.title
 
 ```
 ## 2. Migrasi Basis Data:
@@ -119,19 +95,31 @@ python manage.py migrate
 
 ## 3. Untuk menampilkan model-model yang Anda buat di Django Admin, Anda dapat melakukan langkah-langkah berikut:
 
-[File Admin.py](https://github.com/hermantoXYZ/django-eccomerce/blob/main/accounts/admin.py)
+[File Admin.py](https://github.com/hermantoXYZ/django-blog/blob/main/blog/admin.py)
 ```
+# blog/admin.py
+
 from django.contrib import admin
-from .models import Product, Category, Order, OrderItem, Customer, Page
+from .models import Category, Page, Blog
 
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('category', 'slug')
+    prepopulated_fields = {'slug': ('category',)}
 
-admin.site.register(Product)
-admin.site.register(Category)
-admin.site.register(Order)
-admin.site.register(OrderItem)
-admin.site.register(Customer)
+class PageAdmin(admin.ModelAdmin):
+    list_display = ('title',)
+    search_fields = ('title',)
 
-admin.site.register(Page)
+class BlogAdmin(admin.ModelAdmin):
+    list_display = ('title', 'author', 'category', 'status', 'created_date', 'published_date')
+    list_filter = ('category', 'status', 'created_date', 'published_date')
+    search_fields = ('title', 'author', 'content')
+    prepopulated_fields = {'slug': ('title',)}
+
+admin.site.register(Category, CategoryAdmin)
+admin.site.register(Page, PageAdmin)
+admin.site.register(Blog, BlogAdmin)
+
 ```
 
 untuk memastikan, cek dashboard admin login ke 
