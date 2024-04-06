@@ -125,130 +125,84 @@ admin.site.register(Blog, BlogAdmin)
 untuk memastikan, cek dashboard admin login ke 
 - http://127.0.0.1:8000/admin/ 
 
-![Admin Dashboard](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/2.JPG)
+![Admin Dashboard](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/1.JPG)
 
 ## 4. Buat sebuah fungsi tampilan baru di views.py untuk menampilkan models.py
 
-[File views.py](https://github.com/hermantoXYZ/django-eccomerce/blob/main/accounts/views.py)
+[File views.py](https://github.com/hermantoXYZ/django-blog/blob/main/blog/views.py)
 
 ```
-from django.shortcuts import render
-#tambahkan product dalam views.py
-from .models import Product, Order, Page
-from django.http import HttpResponse
-from django.shortcuts import render, get_object_or_404, redirect
-from .forms import OrderForm
+# blog/views.py
 
-#Product List
-def product_list(request):
-    products = Product.objects.all()
-    return render(request, 'product_list.html', {'products': products})
+from django.shortcuts import render, get_object_or_404
+from .models import Category, Page, Blog
 
-# Menampilkan Product list di home.html
 def home(request):
-    products = Product.objects.all()
-    return render(request, 'home.html', {'products': products})
+    categories = Category.objects.all()
+    pages = Page.objects.filter(is_published=True)
+    posts = Blog.objects.filter(status=1)
+    return render(request, 'home.html', {'categories': categories, 'pages': pages, 'posts': posts})
 
-# Menampilkan Product Detail
-def product_detail(request, product_id):
-    # Dapatkan objek produk berdasarkan ID atau tampilkan 404 jika tidak ditemukan
-    product = get_object_or_404(Product, pk=product_id)
-    return render(request, 'product_detail.html', {'product': product})
+def category_list(request):
+    categories = Category.objects.all()
+    return render(request, 'category_list.html', {'categories': categories})
 
+def post_list(request):
+    posts = Blog.objects.filter(status=1)
+    return render(request, 'post_list.html', {'posts': posts})
 
-def order_list(request):
-    orders = Order.objects.all()
-    return render(request, 'order_list.html', {'orders': orders})
+def page_list(request):
+    pages = Page.objects.filter(is_published=True)
+    return render(request, 'page_list.html', {'pages': pages})
 
-def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
-    return render(request, 'order_detail.html', {'order': order})
+def post_detail(request, slug):
+    post = get_object_or_404(Blog, slug=slug, status=1)
+    return render(request, 'post_detail.html', {'post': post})
 
-# Menampilkan order Create
-def order_create(request):
-    product_id = request.GET.get('product_id')
-    product = get_object_or_404(Product, id=product_id)
-    
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            quantity = form.cleaned_data['quantity']
-            total_price = product.price * quantity  # Hitung total harga
-            order = form.save(commit=False)
-            order.total_price = total_price
-            order.save()  # Simpan objek Order terlebih dahulu
-            order.products.add(product, through_defaults={'quantity': quantity})
-            return redirect('order_detail', order_id=order.id)
-    else:
-        form = OrderForm(initial={'products': [product]})
-    return render(request, 'order_create.html', {'form': form})
-
-# Menampilkan Page Detail
 def page_detail(request, slug):
-    page = get_object_or_404(Page, slug=slug)
+    page = get_object_or_404(Page, slug=slug, is_published=True)
     return render(request, 'page_detail.html', {'page': page})
+
 ```
 
 
 ## 5 Tambahkan pola URL yang mengarah ke fungsi
 
 ```
+# blog/urls.py
+
 from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.home, name='index'),
-    path('products/', views.product_list, name='product_list'),
-    path('products/<int:product_id>/', views.product_detail, name='product_detail'),
-    path('orders/', views.order_list, name='order_list'),
-    path('orders/<int:order_id>/', views.order_detail, name='order_detail'),
-    path('order/create/', views.order_create, name='order_create'),
+    path('', views.home, name='home'),
+    path('categories/', views.category_list, name='category_list'),
+    path('posts/', views.post_list, name='post_list'),
+    path('pages/', views.page_list, name='page_list'),
+    path('post/<slug:slug>/', views.post_detail, name='post_detail'),
     path('page/<slug:slug>/', views.page_detail, name='page_detail'),
 ]
 
-```
-
-## 6 Buat Formulir untuk memasukan data pesanan
-> Anda perlu membuat formulir untuk memasukkan data pesanan. Buatlah file forms.py dalam aplikasi Anda dan tambahkan formulir seperti ini:
 
 ```
-#accounts\forms.py
-from django import forms
-from .models import Order
 
-class OrderForm(forms.ModelForm):
-    # Tambahkan field quantity ke dalam form
-    quantity = forms.IntegerField(min_value=1, initial=1)
+## 6 Menampilkan daftar halaman di template HTML
 
-    class Meta:
-        model = Order
-        fields = ['customer_name', 'phone_number', 'address', 'products', 'total_price', 'quantity']
+[File Template HTML](https://github.com/hermantoXYZ/django-blog/tree/main/templates)
 
-```
-[File Forms.py](https://github.com/hermantoXYZ/django-eccomerce/blob/main/accounts/forms.py)
+![List HTMl](https://github.com/hermantoXYZ/django-blog/blob/main/screnshoots/2.JPG)
 
-
-
-## 7 Menampilkan daftar halaman di template HTML
-
-[File Template HTML](https://github.com/hermantoXYZ/django-eccomerce/tree/main/templates)
-
-![List HTMl](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/1.JPG)
-
-## Page website Eccomerce
+## Page website Blog
 - http://127.0.0.1:8000/
-- http://127.0.0.1:8000/products/ (list products)
-- http://127.0.0.1:8000/products/1/ (order detail)
-- http://127.0.0.1:8000/orders/ (list order)
-- http://127.0.0.1:8000/order/create/?product_id=1 (buat pesanan)
-- http://127.0.0.1:8000/page/about/ etc
+- http://127.0.0.1:8000/categories/ (list Categories)
+- http://127.0.0.1:8000/posts/ (List Post)
+- http://127.0.0.1:8000/pages/ (list pages)
+- http://127.0.0.1:8000/post/url-post/ (Detail Post)
+- http://127.0.0.1:8000/page/about/ contoh page dengan nama about
 
 
 ![List Galery](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/3.JPG)
-![List Galery](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/4.JPG)
-![List Galery](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/5.JPG)
-![List Galery](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/6.JPG)
-![List Galery](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/7.JPG)
+
 
 
 ## License <a name="license"></a>
