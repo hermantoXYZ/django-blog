@@ -204,6 +204,5 @@ urlpatterns = [
 ![List Galery](https://github.com/hermantoXYZ/django-eccomerce/blob/main/screenshot/3.JPG)
 
 
-
 ## License <a name="license"></a>
 XYZHermanto. Check `LICENSE`.
