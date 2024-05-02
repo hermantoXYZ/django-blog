@@ -3,8 +3,7 @@
 import os
 import sys
 
-#saya hapus dulu v2
-#dsd
+# for testing
 
 def main():
     """Run administrative tasks."""
