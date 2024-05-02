@@ -3,7 +3,8 @@
 import os
 import sys
 
-#updates Menu
+#saya hapus dulu v2
+#dsd
 
 def main():
     """Run administrative tasks."""
