@@ -3,7 +3,7 @@
 import os
 import sys
 
-#updates
+#updates Menu
 
 def main():
     """Run administrative tasks."""
